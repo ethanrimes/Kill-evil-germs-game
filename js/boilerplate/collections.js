@@ -200,10 +200,13 @@ Collection.prototype = {
    *   An Array containing the removed element, if any.
    */
   remove: function(item) {
+    console.log('Removing item:', item);
+    console.log('Collection:', this.length);
     const index = this.indexOf(item);
-    if (index > -1) {
-      return this.splice(index, 1);
+    if (index !== -1) {
+      this.splice(index, 1);
     }
+    console.log('Collection after removal:', this.length);
     return null;
   },
 
