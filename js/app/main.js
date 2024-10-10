@@ -33,8 +33,8 @@ var preloadables = [];
  */
 function update() {
   player.update();
-  window.evilGermsCollection.forEach(germ => germ.update());
-  window.bulletsCollection.forEach(bullet => bullet.update());
+  window.evilGermsCollection.forEach(germ => germ.update(context));
+  window.bulletsCollection.forEach(bullet => bullet.update(context));
 }
 
 /**
@@ -43,7 +43,7 @@ function update() {
 function draw() {
   // Draw a background. This is just for illustration so we can see scrolling.
   context.drawCheckered(80, 0, 0, world.width, world.height);
-	player.draw(ctx=context);
+	player.draw(context);
   window.evilGermsCollection.forEach(germ => germ.draw(context));
   window.bulletsCollection.forEach(bullet => bullet.draw(context));
 }

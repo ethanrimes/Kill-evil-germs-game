@@ -1724,7 +1724,7 @@ var Player = Actor.extend({
   },
 
   fire: function() {
-    var bullet = new Bullet(this.x, this.y + this.height/2, 10, 10, 'red', this.leftMovementDirection);
+    var bullet = new Bullet(this.x, this.y + this.height/2, 50, 50, 'red', this.leftMovementDirection);
     window.bulletsCollection.add(bullet);
   },
 
@@ -1757,12 +1757,11 @@ var EvilGerm = Actor.extend({
   draw: function(ctx) {
     this._super(ctx);
     ctx.drawImage(this.src, this.x, this.y, this.width, this.height);
-    console.log('Drawing evil germ');
+    // console.log('Drawing evil germ');
   },
 
   update: function(ctx) {
     this.draw(ctx);
-    this.x += this.direction * 10;
     if (this.x < 0 || this.x > world.width) {
       this.destroy();
     }
@@ -1772,6 +1771,7 @@ var EvilGerm = Actor.extend({
   },
 
   destroy: function() {
+    console.log('Destroying evil germ');
     this._super.apply(this, arguments);
     window.evilGermsCollection.remove(this);
   },
@@ -1785,40 +1785,29 @@ var Bullet = Actor.extend({
   init: function(x, y, w, h, fillStyle, leftDirection) {
     this._super(x, y, w, h, fillStyle);
     this.direction = leftDirection ? -1 : 1;
-    console.log('Bullet direction:', this.direction);
+    this.src = new Image();
+    this.src.src = './examples/images/cnc.jpg';
   },
 
-  update: function() {
-    this._super();
-    this.x += this.direction * 10;
+  update: function(ctx) {
+    this.draw(ctx);
+    this.x += this.direction * 1.5;
     if (this.x < 0 || this.x > world.width) {
       this.destroy();
     }
-    if (this.collides(window.evilGermsCollection)) {
+    var collidedGerms = this.collides(window.evilGermsCollection, returnAll=true);
+    if (collidedGerms) {
+      console.log('Collided with germs:', collidedGerms);
+      collidedGerms.forEach(function(germ) {
+        germ.destroy();
+      });
       this.destroy();
     }
   },
 
   draw: function(ctx) {
     this._super(ctx);
-    
-    // Set the fill style to red for the bullet
-    ctx.fillStyle = 'red';
-    
-    // Begin a new path for the circle
-    ctx.beginPath();
-    
-    // Draw a circle (arc) at the bullet's position
-    ctx.arc(
-        this.x + this.width / 2, // x-coordinate of the center
-        this.y + this.height / 2, // y-coordinate of the center
-        Math.min(this.width, this.height) / 2, // radius
-        0, // start angle
-        Math.PI * 2 // end angle (full circle)
-    );
-    
-    // Fill the circle with the current fill style
-    ctx.fill();
+    ctx.drawImage(this.src, this.x, this.y, this.width, this.height);
   },
 
   destroy: function() {
