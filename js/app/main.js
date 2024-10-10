@@ -35,6 +35,7 @@ function update() {
   player.update();
   window.evilGermsCollection.forEach(germ => germ.update(context));
   window.bulletsCollection.forEach(bullet => bullet.update(context));
+  window.germCounter.update(context);
 }
 
 /**
@@ -46,6 +47,7 @@ function draw() {
 	player.draw(context);
   window.evilGermsCollection.forEach(germ => germ.draw(context));
   window.bulletsCollection.forEach(bullet => bullet.draw(context));
+  window.germCounter.draw(context);
 }
 
 /**
@@ -68,5 +70,6 @@ function setup(first) {
   // Initialize the evil germs.
   window.evilGermsCollection = new Collection();
   window.bulletsCollection = new Collection();
+  window.germCounter = new GermCounter(25, 25, 100, 50, 'white');
 
 }

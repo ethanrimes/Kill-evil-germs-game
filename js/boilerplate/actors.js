@@ -1787,6 +1787,7 @@ var Bullet = Actor.extend({
     this.direction = leftDirection ? -1 : 1;
     this.src = new Image();
     this.src.src = './examples/images/cnc.jpg';
+    this.radians = 0;
   },
 
   update: function(ctx) {
@@ -1813,6 +1814,44 @@ var Bullet = Actor.extend({
   destroy: function() {
     this._super.apply(this, arguments);
     window.bulletsCollection.remove(this);
+  },
+});
+
+
+var GermCounter = Actor.extend({
+  init: function(x, y, w, h, fillStyle) {
+    this._super(x, y, w, h, fillStyle);
+    this.originalX = x;
+    this.originalY = y;
+  },
+
+  draw: function(ctx) {
+    // Calculate the color for the bottom layer based on the number of germs
+    const maxGerms = 50;
+    const germsCount = window.evilGermsCollection.length;
+    const red = Math.min(255, Math.floor((germsCount / maxGerms) * 255));
+    const green = Math.min(255, Math.floor(((maxGerms - germsCount) / maxGerms) * 255));
+    const bottomColor = `rgb(${red}, ${green}, 0)`;
+  
+    // Draw the bottom layer
+    ctx.fillStyle = bottomColor;
+    ctx.fillRect(this.x, this.y, 200, 50); // Adjust size as needed
+  
+    // Draw the top layer
+    ctx.fillStyle = 'white';
+    ctx.fillRect(this.x + 10, this.y + 10, 180, 30); // Adjust size and position as needed
+  
+    // Draw the text
+    ctx.fillStyle = 'black';
+    ctx.font = '16px Arial';
+    ctx.fillText('Germs alive: ' + germsCount + "/"+maxGerms, this.x + 15, this.y + 30); // Adjust position as needed
+  },
+
+  update: function(ctx) {
+    const worldPosition = world.canvasToWorldPosition(this.originalX, this.originalY);
+    this.x = worldPosition.x;
+    this.y = worldPosition.y;
+    this.draw(ctx);
   },
 });
 
