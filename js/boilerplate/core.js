@@ -103,6 +103,8 @@ App.Debug = {};
 App.Debug.updateTimeElapsed = 0;
 App.Debug.clearTimeElapsed = 0;
 App.Debug.drawTimeElapsed = 0;
+// Define the interval at which germs should be spawned (in seconds)
+App.spawnInterval = 5; // Adjust this value as needed
 
 // SETUP ----------------------------------------------------------------------
 
@@ -549,6 +551,7 @@ window.startAnimating = function() {
      * @member global
      */
     jQuery(document).trigger('startAnimating');
+    App.timeAtLastSpawn = 0;
     animate();
   }
 };
@@ -662,10 +665,7 @@ function animate() {
     Timer.event('debug timer update', true);
   }
 
-  // Define a variable to track the time since the last germ spawn
-  let timeSinceLastSpawn = 0;
-  // Define the interval at which germs should be spawned (in seconds)
-  const spawnInterval = 5; // Adjust this value as needed
+  
 
   // update
   if (window.Mouse && Mouse.Scroll) {
@@ -688,14 +688,14 @@ function animate() {
       update(App.physicsDelta, App.physicsTimeElapsed);
     }
     // Increment the time since the last spawn by the physics delta
-    timeSinceLastSpawn += App.physicsDelta;
 
+    console.log('number of germs', window.evilGermsCollection.length);
     // Check if it's time to spawn a new germ
-    if (timeSinceLastSpawn >= spawnInterval) {
+    if (App.physicsTimeElapsed - App.timeAtLastSpawn >= App.spawnInterval) {
       // Spawn a new germ
       spawnGerm();
       // Reset the timer
-      timeSinceLastSpawn = 0;
+      App.timeAtLastSpawn = App.physicsTimeElapsed;
     }
     
     frameDelta -= App.physicsDelta;
@@ -1526,5 +1526,5 @@ function spawnGerm() {
   while (germ.collides(evilGermsCollection)) {
     germ.respawnGerm();
   }
-  window.evilGermsCollection.push(germ); // Assuming gameObjects is an array holding all game entities
+  window.evilGermsCollection.add(germ); // Assuming gameObjects is an array holding all game entities
 }

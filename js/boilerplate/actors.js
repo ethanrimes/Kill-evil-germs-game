@@ -1720,7 +1720,7 @@ var Player = Actor.extend({
 /**
  * EvilGerm class
  */
-var EvilGerm = Box.extend({
+var EvilGerm = Actor.extend({
   init: function(x, y, w, h, fillStyle) {
     // Call the parent class's constructor
     this.src = new Image();
@@ -1732,6 +1732,6 @@ var EvilGerm = Box.extend({
     this.x = App.Utils.getRandIntBetween(0, world.width);
     this.y = App.Utils.getRandIntBetween(0, world.height);
   },
-  
+
 });
 
