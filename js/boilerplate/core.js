@@ -104,7 +104,7 @@ App.Debug.updateTimeElapsed = 0;
 App.Debug.clearTimeElapsed = 0;
 App.Debug.drawTimeElapsed = 0;
 // Define the interval at which germs should be spawned (in seconds)
-App.spawnInterval = 5; // Adjust this value as needed
+App.spawnInterval = 1; // Adjust this value as needed
 
 // SETUP ----------------------------------------------------------------------
 
@@ -1521,7 +1521,7 @@ Number.prototype.sign = function(v) {
 function spawnGerm() {
   const x = App.Utils.getRandIntBetween(0, world.width);
   const y = App.Utils.getRandIntBetween(0, world.height);
-  const germ = new EvilGerm(x, y); // Assuming EnemySprite is a defined class
+  const germ = new EvilGerm(x, y);
   console.log('Germ spawned at', x, y);
   while (germ.collides(evilGermsCollection)) {
     germ.respawnGerm();

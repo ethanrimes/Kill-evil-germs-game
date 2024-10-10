@@ -605,7 +605,6 @@ var Actor = Box.extend({
    * @inheritdoc Box#draw
    */
   draw: function() {
-    console.log('BOX Drawing Player:', this);
     if (this.src instanceof SpriteMap && this.animLoop) {
       this.src.use(this.animLoop); // Switch to the active animation loop
     }
@@ -1566,6 +1565,7 @@ var Player = Actor.extend({
    * make the Actor jump again.
    */
   JUMP_RELEASE: true,
+  
 
   /**
    * @constructor
@@ -1577,8 +1577,8 @@ var Player = Actor.extend({
    * @inheritdoc Box#constructor
    */
   init: function() {
-    console.log('Player init called');
     this._super.apply(this, arguments);
+    this.leftMovementDirection = true;
     
     // Load the player image
     this.src = new Image();
@@ -1592,6 +1592,18 @@ var Player = Actor.extend({
     this.src.onerror = function() {
       console.error('Failed to load image');
     };
+
+     // Set up key listeners
+    var self = this;
+    document.addEventListener('keydown', function(event) {
+      if (event.code === 'ArrowRight') {
+        self.leftMovementDirection = false;
+      } else if (event.code === 'ArrowLeft') {
+        self.leftMovementDirection = true;
+      } else if (event.code === 'Space') {
+        self.fire(); // Call the fire method when space bar is pressed
+      }
+    });
   },
 
   /**
@@ -1643,19 +1655,22 @@ var Player = Actor.extend({
   
 
   draw: function(ctx) {
-    console.log('Player draw method called');
-    
     // Call the Actor's draw method
     this._super(ctx);
-    
+
     // Then do Player-specific drawing
     if (this.src && this.src.complete) {
-      console.log('Drawing player image');
-      ctx.drawImage(this.src, this.x, this.y, this.width, this.height);
-    } else {
-      console.log('Falling back to default player draw');
-      // The default drawing is already done by the parent draw method
-    }
+      if (this.leftMovementDirection) {
+        ctx.drawImage(this.src, this.x, this.y, this.width, this.height);
+      } else {
+        // Draw mirrored image
+        ctx.save();
+        ctx.scale(-1, 1); // Flip horizontally
+        ctx.drawImage(this.src, -this.x - this.width, this.y, this.width, this.height);
+        ctx.restore();
+      }
+    } 
+
   },
 
   // Method to toggle selection
@@ -1708,6 +1723,11 @@ var Player = Actor.extend({
     return changed;
   },
 
+  fire: function() {
+    var bullet = new Bullet(this.x, this.y + this.height/2, 10, 10, 'red', this.leftMovementDirection);
+    window.bulletsCollection.add(bullet);
+  },
+
   /**
    * Clean up after ourselves.
    */
@@ -1722,10 +1742,11 @@ var Player = Actor.extend({
  */
 var EvilGerm = Actor.extend({
   init: function(x, y, w, h, fillStyle) {
+    this._super(x, y, w, h, fillStyle);
     // Call the parent class's constructor
     this.src = new Image();
     this.src.src = './examples/images/germ.webp';
-    this._super(x, y, w, h, fillStyle);
+
   },
 
   respawnGerm: function() {
@@ -1733,5 +1754,76 @@ var EvilGerm = Actor.extend({
     this.y = App.Utils.getRandIntBetween(0, world.height);
   },
 
+  draw: function(ctx) {
+    this._super(ctx);
+    ctx.drawImage(this.src, this.x, this.y, this.width, this.height);
+    console.log('Drawing evil germ');
+  },
+
+  update: function(ctx) {
+    this.draw(ctx);
+    this.x += this.direction * 10;
+    if (this.x < 0 || this.x > world.width) {
+      this.destroy();
+    }
+    if (this.collides(window.bulletsCollection)) {
+      this.destroy();
+    }
+  },
+
+  destroy: function() {
+    this._super.apply(this, arguments);
+    window.evilGermsCollection.remove(this);
+  },
+
+});
+
+/**
+ * Bullet class
+ */
+var Bullet = Actor.extend({
+  init: function(x, y, w, h, fillStyle, leftDirection) {
+    this._super(x, y, w, h, fillStyle);
+    this.direction = leftDirection ? -1 : 1;
+    console.log('Bullet direction:', this.direction);
+  },
+
+  update: function() {
+    this._super();
+    this.x += this.direction * 10;
+    if (this.x < 0 || this.x > world.width) {
+      this.destroy();
+    }
+    if (this.collides(window.evilGermsCollection)) {
+      this.destroy();
+    }
+  },
+
+  draw: function(ctx) {
+    this._super(ctx);
+    
+    // Set the fill style to red for the bullet
+    ctx.fillStyle = 'red';
+    
+    // Begin a new path for the circle
+    ctx.beginPath();
+    
+    // Draw a circle (arc) at the bullet's position
+    ctx.arc(
+        this.x + this.width / 2, // x-coordinate of the center
+        this.y + this.height / 2, // y-coordinate of the center
+        Math.min(this.width, this.height) / 2, // radius
+        0, // start angle
+        Math.PI * 2 // end angle (full circle)
+    );
+    
+    // Fill the circle with the current fill style
+    ctx.fill();
+  },
+
+  destroy: function() {
+    this._super.apply(this, arguments);
+    window.bulletsCollection.remove(this);
+  },
 });
 
