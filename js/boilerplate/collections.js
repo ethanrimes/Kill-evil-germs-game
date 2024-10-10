@@ -199,7 +199,14 @@ Collection.prototype = {
    * @return Array
    *   An Array containing the removed element, if any.
    */
-  remove: Array.prototype.remove,
+  remove: function(item) {
+    const index = this.indexOf(item);
+    if (index > -1) {
+      return this.splice(index, 1);
+    }
+    return null;
+  },
+
   /**
    * Remove and return the last item in the Collection.
    *

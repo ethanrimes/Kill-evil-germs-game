@@ -34,6 +34,7 @@ var preloadables = [];
 function update() {
   player.update();
   window.evilGermsCollection.forEach(germ => germ.update());
+  window.bulletsCollection.forEach(bullet => bullet.update());
 }
 
 /**
@@ -44,8 +45,7 @@ function draw() {
   context.drawCheckered(80, 0, 0, world.width, world.height);
 	player.draw(ctx=context);
   window.evilGermsCollection.forEach(germ => germ.draw(context));
-  // console.log('Player instance drawn:', player);
-  // console.log('Player draw method:', player.draw);
+  window.bulletsCollection.forEach(bullet => bullet.draw(context));
 }
 
 /**
@@ -67,5 +67,6 @@ function setup(first) {
 
   // Initialize the evil germs.
   window.evilGermsCollection = new Collection();
+  window.bulletsCollection = new Collection();
 
 }
